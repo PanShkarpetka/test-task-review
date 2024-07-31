@@ -1,14 +1,11 @@
 import "reflect-metadata"
 
-import { RoundService } from './round.service'
+import { RoundService } from './services/round/round.service'
 import { RoundParamsDto } from './common/dto/round-params.dto'
-import * as process from 'node:process'
 
 const roundService = new RoundService()
+const roundParams = new RoundParamsDto({})
+const result = roundService.executeRound(roundParams)
 
-
-const res = roundService.go(new RoundParamsDto({}))
-
-console.log(res)
-process.exit(0)
+console.log(result)
 

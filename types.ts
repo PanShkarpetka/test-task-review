@@ -35,4 +35,18 @@ export type InjectionToPatternItem = {
 
 export type ModulesInjectiveFunctions = Function[]
 
-export type InjectionToRoundState = any
+export type RoundStateUpdates = Partial<ISpinParams>
+export type InjectionToRoundState = {
+  roundState: any
+  updates: RoundStateUpdates
+}
+
+export type RoundProcessorResult = {
+  contexts: any
+}
+
+export type Finalizer = Record<string, boolean>
+
+export interface FinalizerInterface {
+  check: Function
+}

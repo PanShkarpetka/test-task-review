@@ -1,24 +1,19 @@
-import conditions from '../conditions'
 import { ISpinParams } from '../../../types'
+import {isFinalizerEnabled} from "../helpers";
 
 /**
- * @param {ISpinParams} params
+ * The check function takes an object of type ISpinParams as a parameter and returns any.
+ * It checks if the finalizer is enabled based on the conditions specified in the finalizer config.
+ * If the finalizer is enabled, it returns the 'toContext' property of the finalizer config.
+ * @param {ISpinParams} params - The parameters for the check function.
+ * @returns {any} - The value of the 'toContext' property of the finalizer config if the finalizer is enabled, otherwise undefined.
  */
 function check(params: ISpinParams): any {
-  const { settings, agentDI } = params
-  const { [agentDI.glossary.finalizerTypes.CONTEXT]: config } = settings.finalizer
-  if (isEnable()) {
-    return config.toContext
-  }
+  const { settings: {finalizer}, agentDI } = params
+  const { [agentDI.glossary.finalizerTypes.CONTEXT]: config } = finalizer
 
-  function isEnable(): boolean {
-    for (const conditionType of config.conditions) {
-      const conditionResult = conditions[conditionType](params)
-      if (!conditionResult) {
-        return false
-      }
-    }
-    return true
+  if (isFinalizerEnabled(params, config.conditions)) {
+    return config.toContext
   }
 }
 
