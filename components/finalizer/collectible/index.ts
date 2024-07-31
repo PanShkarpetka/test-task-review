@@ -1,33 +1,29 @@
-import conditions from '../conditions'
 import { ISpinParams } from '../../../types'
+import {isFinalizerEnabled} from "../helpers";
 
 /**
- * @param {ISpinParams} params
- * @param type string
+ * Checks if the finalizer is enabled based on the given conditions.
+ * If enabled, updates the collectible stat and adds a feature to the agent's featurer.
+ *
+ * @param {ISpinParams} params - The parameters for the finalizer.
+ * @param {string} type - The type of finalizer.
  */
 function check(params: ISpinParams, type): void {
-  const { settings, agentDI } = params
-  const config = settings.finalizer[type]
-  if (isEnable()) {
-    agentDI.stats.get().updateCollectible(config.step)
-    const value =
-      agentDI.stats.getValuesByMode()[agentDI.glossary.finalizerTypes.COLLECTIBLE]
-    agentDI.featurer.add({
-      type: agentDI.glossary.finalizerTypes.COLLECTIBLE,
-      name: config.name,
-      value,
-    })
+  const { settings: {finalizer}, agentDI } = params
+
+  if (!finalizer[type]) {
+    return
   }
 
-  function isEnable(): boolean {
-    let result = true
-    for (const conditionType of config.conditions) {
-      result = result && conditions[conditionType](params)
-      if (!result) {
-        return result
-      }
-    }
-    return result
+  const {conditions, step, name} = finalizer[type]
+
+  if (isFinalizerEnabled(params, conditions)) {
+    agentDI.stats.get().updateCollectible(step)
+    agentDI.featurer.add({
+      type: agentDI.glossary.finalizerTypes.COLLECTIBLE,
+      name: name,
+      value: agentDI.stats.getValuesByMode()[agentDI.glossary.finalizerTypes.COLLECTIBLE],
+    })
   }
 }
 
